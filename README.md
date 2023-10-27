@@ -10,7 +10,9 @@ http://fenix.ur.edu.pl/~mkepski/ds/uf.html
 
 
 # Potential uniquness
-use ensemble learning to have mutliple models
+use ensemble learning to have mutliple models, and evaluate them using the main program.
+
+![Alt text](image.png)
 
 # Challenges we encountered
 
