@@ -2,3 +2,5 @@ opencv-python
 torch
 torchvision
 tqdm~=4.64.0
+sklearn
+PIL
