@@ -19,10 +19,10 @@ import pytorch_lightning as pl
 # Import all models here
 from dataset import FallDetectionDataset
 from models.baseline import ResNetFallDetectionModel
-from models.fall_detection_feedforward_model import FeedForwardFallDetectionModel
+from models.dummy_model import VGGFallDetectionModel
 
 
-IS_DEBUG_MODE = False  # Trainer will only run 1 step on training and testing if set to True
+IS_DEBUG_MODE = True  # Trainer will only run 1 step on training and testing if set to True
 FRAMES_DIRECTORY = 'data/Frames_Extracted'
 
 
@@ -74,15 +74,17 @@ def main():
     train_set_resnet = FallDetectionDataset(train_frames, transform='default')
     train_loader_resnet = DataLoader(train_set_resnet, batch_size=32, shuffle=True)
     train_and_test_model(resnet_model, train_loader_resnet, test_frames, "fall-detection")
+    print("ResNetFallDetectionModel successful ran")
 
-    # Train and test the FeedForward model
-    input_size = 1000
-    hidden_size = 256
-    num_hidden_layers = 2
-    ffn_model = FeedForwardFallDetectionModel(input_size, hidden_size, num_hidden_layers)
-    train_set_ffn = FallDetectionDataset(train_frames, transform='default')
-    train_loader_ffn = DataLoader(train_set_ffn, batch_size=32, shuffle=True)
-    train_and_test_model(ffn_model, train_loader_ffn, test_frames, "fall-detection-ffn")
+
+    # Train and test the VGG model
+    sfd_model = VGGFallDetectionModel()
+    train_set_densenet = FallDetectionDataset(train_frames, transform='default')
+    train_loader_densenet = DataLoader(train_set_densenet, batch_size=32, shuffle=True)
+    train_and_test_model(sfd_model, train_loader_densenet, test_frames, "sophisticated-fall-detection")
+    print("VGGFallDetectionModel successful ran")
+
+
 
 
 if __name__ == "__main__":
