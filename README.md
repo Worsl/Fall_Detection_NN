@@ -17,7 +17,7 @@ Run `notebooks/extract_frames_from_videos.ipynb` to extract the frames from vide
 # Potential uniquness
 use ensemble learning to have mutliple models, and evaluate them using the main program.
 
-![Alt text](image.png)
+![Alt text](workPlan.png)
 
 things to note for ensemble learning
 1. each model must at least have a classification accuracy of > 0.5 ( we can do verify and prove this during our testing )
