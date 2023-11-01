@@ -19,12 +19,10 @@ use ensemble learning to have mutliple models, and evaluate them using the main 
 
 ![Alt text](image.png)
 
-
 things to note for ensemble learning
 1. each model must at least have a classification accuracy of > 0.5 ( we can do verify and prove this during our testing )
 2. each model must be independent from other models ( how to train better? maybe bootstrapping, random forest )
-
-
+3. use an odd number of models.(maybe 3?)
 
 # Challenges we encountered
 
