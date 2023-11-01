@@ -1,5 +1,6 @@
 /data/
+/lightning_logs/
 .idea/
 __pycache__/
 wandb/
-/lightning_logs/
+
