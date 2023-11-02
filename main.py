@@ -22,6 +22,9 @@ from models.baseline import ResNetFallDetectionModel
 
 FRAMES_DIRECTORY = 'data/Frames_Extracted'
 IS_DEBUG_MODE = False  # Trainer will only run 1 step on training and testing if set to True
+MAX_EPOCH_NUM = 10
+
+assert MAX_EPOCH_NUM >= 1
 
 
 # load image file paths
@@ -47,7 +50,7 @@ logger = WandbLogger(save_dir='.', name="fall-detection")
 
 
 model = ResNetFallDetectionModel()
-trainer = pl.Trainer(max_epochs=10, enable_checkpointing=True, logger=logger,
+trainer = pl.Trainer(max_epochs=MAX_EPOCH_NUM, enable_checkpointing=True, logger=logger,
                      enable_progress_bar=True, fast_dev_run=IS_DEBUG_MODE)
 trainer.fit(model, train_dataloaders=train_loader)
 
