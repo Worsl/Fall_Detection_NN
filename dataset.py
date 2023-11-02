@@ -35,11 +35,13 @@ class FallDetectionDataset(Dataset):
         # - useColorContrastAugment: Applies random color and contrast adjustments to the image.
         # - useNoiseInjection: Adds random noise to simulate real-world imperfections.
         # - useHorizontalFlip: Applies horizontal flipping to the image.
+        # - useShearing : Applies random shear to the image.
 
         self.useRotation = True
         self.useColorContrastAugment = True
         self.useNoiseInjection = True
         self.useHorizontalFlip = True
+        self.useShearing = True
 
     
         if transform == 'default':
@@ -66,6 +68,18 @@ class FallDetectionDataset(Dataset):
         # Apply horizontal flipping with a 50% probability
         if random.random() < 0.5:
             frame = frame.transpose(Image.FLIP_LEFT_RIGHT)
+        return frame
+
+    def apply_random_shearing(self, frame):
+        max_shear_x = 10  # Maximum shear angle in the x-direction (degrees)
+        max_shear_y = 10  # Maximum shear angle in the y-direction (degrees)
+
+        shear_x = random.uniform(-max_shear_x, max_shear_x)
+        shear_y = random.uniform(-max_shear_y, max_shear_y)
+
+        # Apply shear using Pillow's transform function
+        return frame.transform(frame.size, Image.AFFINE, (1, shear_x, 0, shear_y, 1, 0))
+    
 
     def __len__(self):
         return len(self.frame_files)
@@ -84,6 +98,9 @@ class FallDetectionDataset(Dataset):
 
         if self.useHorizontalFlip:
             frame = self.apply_horizontal_flip(frame)
+
+        if self.useShearing:
+            frame = self.apply_random_shearing(frame)
 
         frame = self.transform(frame)
 
