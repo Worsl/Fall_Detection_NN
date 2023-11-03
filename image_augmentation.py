@@ -10,7 +10,10 @@ class DataAugmentation:
         self.useHorizontalFlip = True
         self.useShearing = True
 
-    def start_augment(self, frame):
+    def start_augment(self, frame_path):
+        # Load the image from the file path
+        frame = Image.open(frame_path)
+
         augmentation_choices = []
 
         if self.useRotation:
@@ -31,7 +34,9 @@ class DataAugmentation:
         if augmentation_choices:
             selected_augmentation = random.choice(augmentation_choices)
             return selected_augmentation(frame)
-        
+
+        # If no augmentation functions are available, return the original frame
+        return frame
 
     def apply_rotation(self, frame):
         rotation_angle = random.randint(-90, 90)
@@ -53,8 +58,8 @@ class DataAugmentation:
         return Image.fromarray(frame_with_noise)
 
     def apply_horizontal_flip(self, frame):
-            frame = ImageOps.mirror(frame)
-            return frame
+        frame = ImageOps.mirror(frame)
+        return frame
 
     def apply_random_shearing(self, frame):
         max_shear_x = 2  # Maximum shear angle in the x-direction (degrees)
@@ -64,14 +69,3 @@ class DataAugmentation:
         shear_y = random.uniform(-max_shear_y, max_shear_y)
 
         return frame.transform(frame.size, Image.AFFINE, (1, shear_x, 0, shear_y, 1, 0))
-    
-    
-
-
-# Usage:
-# data_augmentation = YourDataAugmentationClass()
-# augmented_frame = data_augmentation.apply_rotation(frame)
-# augmented_frame = data_augmentation.apply_color_contrast_augmentation(frame)
-# augmented_frame = data_augmentation.apply_noise_injection(frame)
-# augmented_frame = data_augmentation.apply_horizontal_flip(frame)
-# augmented_frame = data_augmentation.apply_random_shearing(frame)

@@ -29,6 +29,7 @@ def load_image_file_paths(frames_directory):
     train_frames = []
     test_frames = []
 
+    # The dataAugmentation class takes in a image directory, and augments the image.
     dataAugmentation = DataAugmentation()
 
     for frame in tqdm(total_frames, desc=f'Loading images from the directory {frames_directory}'):
@@ -42,7 +43,7 @@ def load_image_file_paths(frames_directory):
             test_frames.append(frame)
 
         else:
-            frame = dataAugmentation.start_augment(frame)
+            dataAugmentation.start_augment(frame)
             train_frames.append(frame)
     
     return train_frames, test_frames

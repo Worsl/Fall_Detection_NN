@@ -2,7 +2,6 @@ import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-import random
 
 
 transform_default = transforms.Compose([
@@ -27,19 +26,16 @@ class FallDetectionDataset(Dataset):
         :param transform: transforms.Compose or str, 'default' refers to the usage of the default transform
         """
         self.frame_files = frame_files
-
-
+        if transform == 'default':
+            self.transform = transform_default
+        else:
+            self.transform = transform
 
     def __len__(self):
         return len(self.frame_files)
 
     def __getitem__(self, idx):
         frame = Image.open(self.frame_files[idx])
-        
-
-
         frame = self.transform(frame)
-
         is_fall = 'unfall' not in self.frame_files[idx]
         return frame, is_fall
-
