@@ -57,13 +57,15 @@ class ResNetFallDetectionModel(pl.LightningModule):
         y_hat = y_hat.squeeze(1)
         loss = nn.functional.binary_cross_entropy(y_hat, y)
         self.log("test_loss", loss, on_epoch=True)  # on_epoch=True to log the epoch average
-        return y_hat.detach(), y
+        return y_hat.detach(), y, x
 
     def test_epoch_end(self, outputs):
         pred = [x[0] for x in outputs]
         pred = torch.cat(pred)
         target = [x[1] for x in outputs]
         target = torch.cat(target).int()
+        images = [x[2] for x in outputs]
+        images = torch.cat(images)
         # get precision-recall curve
         precisions, recalls, _ = self.pr_curve(pred, target)
         pr_curve_data = list(zip(recalls.cpu().tolist(), precisions.cpu().tolist()))
@@ -79,3 +81,12 @@ class ResNetFallDetectionModel(pl.LightningModule):
                                                            y_true=target.cpu().flatten().tolist(),
                                                            preds=(pred > 0.5).cpu().flatten().tolist(),
                                                            class_names=['is_fall', 'not_fall'])})
+        # log examples of TP, FP, TN, FN
+        tp_images = [img for p, t, img in zip(pred, target, images) if p == t == 1]
+        fp_images = [img for p, t, img in zip(pred, target, images) if p == 1 and t == 0]
+        tn_images = [img for p, t, img in zip(pred, target, images) if p == t == 0]
+        fn_images = [img for p, t, img in zip(pred, target, images) if p == 0 and t == 1]
+        wandb.log({"TP examples": [wandb.Image(img) for img in tp_images[:10]]})
+        wandb.log({"FP examples": [wandb.Image(img) for img in fp_images[:10]]})
+        wandb.log({"TN examples": [wandb.Image(img) for img in tn_images[:10]]})
+        wandb.log({"FN examples": [wandb.Image(img) for img in fn_images[:10]]})
