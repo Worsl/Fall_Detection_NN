@@ -17,8 +17,7 @@ import pytorch_lightning as pl
 from dataset import FallDetectionDataset
 
 from models.baseline import BinaryClassificationDetectionModel
-
-
+from image_augmentation import DataAugmentation
 
 IS_DEBUG_MODE = True  # Trainer will only run 1 step on training and testing if set to True
 FRAMES_DIRECTORY = 'data/Frames_Extracted'
@@ -92,12 +91,12 @@ def main():
     print("VGGModel successful ran")
 
 
-# Train and test the Transformer model
-    simple_model = SimpleFallDetectionModel()  
-    train_set_simple = FallDetectionDataset(train_frames, transform='default')
-    train_loader_simple = DataLoader(train_set_simple, batch_size=32, shuffle=True)
-    train_and_test_model(simple_model, train_loader_simple, test_frames, "simple-fall-detection")
-    print("SimpleFallDetectionModel successfully ran")
+# # Train and test the Transformer model
+#     simple_model = SimpleFallDetectionModel()  
+#     train_set_simple = FallDetectionDataset(train_frames, transform='default')
+#     train_loader_simple = DataLoader(train_set_simple, batch_size=32, shuffle=True)
+#     train_and_test_model(simple_model, train_loader_simple, test_frames, "simple-fall-detection")
+#     print("SimpleFallDetectionModel successfully ran")
 
 
 if __name__ == "__main__":
