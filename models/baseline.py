@@ -10,15 +10,26 @@ from torch import nn
 import pytorch_lightning as pl
 
 
-class ResNetFallDetectionModel(pl.LightningModule):
+class BinaryClassificationDetectionModel(pl.LightningModule):
     """
     A baseline binary classifier that uses pre-trained ResNet50 as the feature extractor and
     a linear layer as the classifier
     """
 
-    def __init__(self):
+    def __init__(self, base_model: str = 'resnet'):
+        """
+
+        :param base_model: str, the type of base model as the feature extractor
+        """
         super().__init__()
-        self.feature_extractor = torchvision.models.resnet50(pretrained=True)
+
+        if base_model == 'resnet':
+            self.feature_extractor = torchvision.models.resnet50(pretrained=True)
+        elif base_model == 'vgg16':
+            self.feature_extractor = torchvision.models.vgg16(pretrained=True)
+        else:
+            raise ValueError(f'{base_model} is an unknown model')
+
         self.fc = nn.Linear(1000, 1)
         self.activation_func = nn.Sigmoid()
 
