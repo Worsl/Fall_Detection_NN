@@ -24,6 +24,7 @@ from models.dummy_model import VGGFallDetectionModel
 
 IS_DEBUG_MODE = True  # Trainer will only run 1 step on training and testing if set to True
 FRAMES_DIRECTORY = 'data/Frames_Extracted'
+DEFAULT_ROOT_DIR = 'checkpoint'
 
 
 def load_image_file_paths(frames_directory):
@@ -50,7 +51,7 @@ def train_and_test_model(model, train_loader, test_frames, name):
     
     # Initialize a PyTorch Lightning Trainer
     trainer = pl.Trainer(max_epochs=10, enable_checkpointing=True, logger=logger,
-                         enable_progress_bar=True, fast_dev_run=IS_DEBUG_MODE)
+                         enable_progress_bar=True, fast_dev_run=IS_DEBUG_MODE, default_root_dir=DEFAULT_ROOT_DIR)
     
     # Train the model on the training dataset
     trainer.fit(model, train_dataloaders=train_loader)
