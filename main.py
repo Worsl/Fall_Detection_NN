@@ -26,7 +26,6 @@ IS_DEBUG_MODE = True  # Trainer will only run 1 step on training and testing if 
 FRAMES_DIRECTORY = 'data/Frames_Extracted'
 
 
-
 def load_image_file_paths(frames_directory):
     total_frames = os.listdir(frames_directory)
     train_frames = []
