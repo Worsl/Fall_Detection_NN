@@ -5,9 +5,6 @@ The entry script to train the model for fall detection with PyTorch Lightning
 @Date 30 Oct 2023
 """
 
-
-
-
 import os
 from tqdm.auto import tqdm
 from torch.utils.data import DataLoader
@@ -18,7 +15,9 @@ import pytorch_lightning as pl
 # Import custom modules
 # Import all models here
 from dataset import FallDetectionDataset
+
 from models.baseline import BinaryClassificationDetectionModel
+
 
 
 IS_DEBUG_MODE = True  # Trainer will only run 1 step on training and testing if set to True
@@ -30,15 +29,22 @@ def load_image_file_paths(frames_directory):
     total_frames = os.listdir(frames_directory)
     train_frames = []
     test_frames = []
-    
+
+    # The dataAugmentation class takes in a image directory, and augments the image.
+    dataAugmentation = DataAugmentation()
+
     for frame in tqdm(total_frames, desc=f'Loading images from the directory {frames_directory}'):
         scenario_name = frame.split('_')[0]
         if '.jpg' not in frame:
             continue
+
         frame = os.path.join(frames_directory, frame)
+
         if scenario_name in FallDetectionDataset.TEST_SET_PREFIX:
             test_frames.append(frame)
+
         else:
+            dataAugmentation.start_augment(frame)
             train_frames.append(frame)
     
     return train_frames, test_frames
@@ -68,6 +74,7 @@ def main():
     # Load image file paths
     train_frames, test_frames = load_image_file_paths(FRAMES_DIRECTORY)
     
+
     # Train and test the ResNet model
     resnet_model = BinaryClassificationDetectionModel(base_model='resnet')
     train_set_resnet = FallDetectionDataset(train_frames, transform='default')
@@ -77,6 +84,7 @@ def main():
 
 
     # Train and test the VGG model
+
     sfd_model = BinaryClassificationDetectionModel(base_model='vgg16')
     train_set_densenet = FallDetectionDataset(train_frames, transform='default')
     train_loader_densenet = DataLoader(train_set_densenet, batch_size=32, shuffle=True)
@@ -84,6 +92,12 @@ def main():
     print("VGGModel successful ran")
 
 
+# Train and test the Transformer model
+    simple_model = SimpleFallDetectionModel()  
+    train_set_simple = FallDetectionDataset(train_frames, transform='default')
+    train_loader_simple = DataLoader(train_set_simple, batch_size=32, shuffle=True)
+    train_and_test_model(simple_model, train_loader_simple, test_frames, "simple-fall-detection")
+    print("SimpleFallDetectionModel successfully ran")
 
 
 if __name__ == "__main__":
