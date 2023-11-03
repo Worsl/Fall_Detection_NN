@@ -54,7 +54,7 @@ def train_and_test_model(model, train_loader, test_frames, name):
     logger = WandbLogger(save_dir='.', name=name)
     
     # Initialize a PyTorch Lightning Trainer
-    trainer = pl.Trainer(max_epochs=10, enable_checkpointing=True, logger=logger,
+    trainer = pl.Trainer(max_epochs=3, enable_checkpointing=True, logger=logger,
                          enable_progress_bar=True, fast_dev_run=IS_DEBUG_MODE, default_root_dir=DEFAULT_ROOT_DIR)
     
     # Train the model on the training dataset
