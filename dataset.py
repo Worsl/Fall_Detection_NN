@@ -8,6 +8,14 @@ transform_default = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         ])
+transform_augmented = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.ColorJitter(brightness=(0.9, 1.1), contrast=(0.9, 1.1)),
+        transforms.RandomAutocontrast(),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomAdjustSharpness(sharpness_factor=2)
+        ])
 
 
 class FallDetectionDataset(Dataset):
@@ -24,11 +32,15 @@ class FallDetectionDataset(Dataset):
         """
         The labels of frames are inferred from the file name
         :param frame_files: list, including the readable paths of frames
-        :param transform: transforms.Compose or str, 'default' refers to the usage of the default transform
+        :param transform: transforms.Compose or str, 'default' refers to the usage of the default transform,
+        'augmented' includes the automatic data augmentation steps
+        (ref: https://pytorch.org/vision/0.11/auto_examples/plot_transforms.html#randomequalize)
         """
         self.frame_files = frame_files
         if transform == 'default':
             self.transform = transform_default
+        elif transform == 'augmented':
+            self.transform = transform_augmented
         else:
             self.transform = transform
 

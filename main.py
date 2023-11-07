@@ -30,7 +30,7 @@ MAX_EPOCHS = 10
 
 def load_image_file_paths(frames_directory: str):
     """
-    Loads train, valid, and test images from `frames_directory`
+    Loads train, valid, and test images from `frames_directory` without data augmentation.
     :param frames_directory: str
     :return: tuple, (train_frames, valid_frames, test_frames)
     """
@@ -38,9 +38,6 @@ def load_image_file_paths(frames_directory: str):
     train_frames = []
     test_frames = []
     valid_frames = []
-
-    # The dataAugmentation class takes in a image directory, and augments the image.
-    dataAugmentation = DataAugmentation()
 
     for frame in tqdm(total_frames, desc=f'Loading images from the directory {frames_directory}'):
         scenario_name = frame.split('_')[0]
@@ -54,7 +51,6 @@ def load_image_file_paths(frames_directory: str):
         elif scenario_name in FallDetectionDataset.VALID_SET_PREFIX:
             valid_frames.append(frame)
         else:
-            dataAugmentation.start_augment(frame)
             train_frames.append(frame)
 
     print(f"len(train_frames) = {len(train_frames)}\tlen(valid_frames) = {len(valid_frames)}\t"
@@ -102,7 +98,7 @@ def main():
 
     # Train and test the ResNet model
     resnet_model = BinaryClassificationDetectionModel(base_model='resnet')
-    train_set = FallDetectionDataset(train_frames, transform='default')
+    train_set = FallDetectionDataset(train_frames, transform='augmented')  # only apply data augmentation on train set
     train_loader = DataLoader(train_set, batch_size=32, shuffle=True)
     valid_set = FallDetectionDataset(valid_frames, transform='default')
     valid_loader = DataLoader(valid_set, batch_size=32, shuffle=False)
