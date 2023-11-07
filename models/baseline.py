@@ -50,6 +50,10 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         y_hat = y_hat.squeeze(1)
         loss = nn.functional.binary_cross_entropy(y_hat, y)
         self.log("train_loss", loss)
+        # Log the first 3 training images to W&B
+        if batch_idx == 0:
+            images = x[:3]
+            wandb.log({"examples_train": [wandb.Image(image) for image in images]})
         return loss
 
     def validation_step(self, batch, batch_idx):

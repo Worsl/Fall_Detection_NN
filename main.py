@@ -62,17 +62,19 @@ def load_image_file_paths(frames_directory: str):
     return train_frames, valid_frames, test_frames
 
 
-def train_and_test_model(model, train_loader, valid_loader, test_loader):
+def train_and_test_model(model, train_loader, valid_loader, test_loader, model_name: str = ""):
     """
     Initialize the trainer. Then, train and test the model.
     :param model: pl.LightningModule
     :param train_loader: torch.utils.data.DataLoader
     :param valid_loader: torch.utils.data.DataLoader
     :param test_loader: torch.utils.data.DataLoader
+    :param model_name: str, for logging purpose
     :return:
     """
     # Initialize a logging tool (WandbLogger)
     logger = WandbLogger(save_dir='.', project='fall_detection', log_model=True)
+    logger.experiment.config["model"] = model_name
 
     callbacks = []
     model_checkpoint_hook = ModelCheckpoint(monitor='valid_loss', mode='min', save_top_k=1)
@@ -107,7 +109,7 @@ def main():
     test_set = FallDetectionDataset(test_frames, transform='default')
     test_loader = DataLoader(test_set, batch_size=32, shuffle=False)
 
-    train_and_test_model(resnet_model, train_loader, valid_loader, test_loader)
+    train_and_test_model(resnet_model, train_loader, valid_loader, test_loader, model_name="ResNet")
     print("ResNet successful ran")
 
     # Train and test the VGG model
