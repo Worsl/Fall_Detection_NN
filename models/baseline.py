@@ -52,6 +52,17 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         self.log("train_loss", loss)
         return loss
 
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y = y.float()
+        z = self.feature_extractor(x)
+        z = self.fc(z)
+        y_hat = self.activation_func(z)
+        y_hat = y_hat.squeeze(1)
+        loss = nn.functional.binary_cross_entropy(y_hat, y)
+        self.log("valid_loss", loss)
+        return loss
+
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
         return optimizer

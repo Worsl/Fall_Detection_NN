@@ -18,6 +18,7 @@ class FallDetectionDataset(Dataset):
     """
     TEST_SET_PREFIX = ['ADL2', 'ADL16', 'ADL10', 'ADL17', 'Fall48', 'Fall40', 'Fall15', 'Fall12', 'Fall5', 'Fall1',
                        'Fall51', 'Fall24', 'Fall50', 'Fall20', 'Fall14']    # pre-generated train-test-split
+    VALID_SET_PREFIX = ['ADL3', 'ADL14', 'Fall31', 'Fall23', 'Fall2', 'Fall47', 'Fall22']   # pre-generated
 
     def __init__(self, frame_files: list, transform=None):
         """
