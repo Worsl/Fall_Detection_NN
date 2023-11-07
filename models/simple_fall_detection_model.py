@@ -1,4 +1,20 @@
+"""
+
+ implements a simple feedforward neural network (FNN). 
+ It consists of an input layer, a hidden layer with ReLU activation, 
+ and an output layer with a sigmoid activation. 
+ 
+ 
+ This architecture is suitable for binary classification tasks, and it takes a flattened input image 
+ and produces a single output representing the probability of belonging to the positive class.
+
+
+"""
+
+import wandb
+import torchvision
 import torch
+import torchmetrics
 from torch import nn
 import pytorch_lightning as pl
 

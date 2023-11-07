@@ -17,6 +17,9 @@ import pytorch_lightning as pl
 from dataset import FallDetectionDataset
 
 from models.baseline import BinaryClassificationDetectionModel
+from models.simple_fall_detection_model import SimpleFallDetectionModel
+from models.alexnet_model import AlexNet
+
 from image_augmentation import DataAugmentation
 
 IS_DEBUG_MODE = True  # Trainer will only run 1 step on training and testing if set to True
@@ -54,7 +57,7 @@ def train_and_test_model(model, train_loader, test_frames, name):
     logger = WandbLogger(save_dir='.', name=name)
     
     # Initialize a PyTorch Lightning Trainer
-    trainer = pl.Trainer(max_epochs=3, enable_checkpointing=True, logger=logger,
+    trainer = pl.Trainer(max_epochs=10, enable_checkpointing=True, logger=logger,
                          enable_progress_bar=True, fast_dev_run=IS_DEBUG_MODE, default_root_dir=DEFAULT_ROOT_DIR)
     
     # Train the model on the training dataset
@@ -78,25 +81,32 @@ def main():
     resnet_model = BinaryClassificationDetectionModel(base_model='resnet')
     train_set_resnet = FallDetectionDataset(train_frames, transform='default')
     train_loader_resnet = DataLoader(train_set_resnet, batch_size=32, shuffle=True)
-    train_and_test_model(resnet_model, train_loader_resnet, test_frames, "fall-detection")
+    train_and_test_model(resnet_model, train_loader_resnet, test_frames, "ResNet-fall-detection")
     print("ResNet successful ran")
 
 
     # Train and test the VGG model
-
     sfd_model = BinaryClassificationDetectionModel(base_model='vgg16')
     train_set_densenet = FallDetectionDataset(train_frames, transform='default')
     train_loader_densenet = DataLoader(train_set_densenet, batch_size=32, shuffle=True)
-    train_and_test_model(sfd_model, train_loader_densenet, test_frames, "sophisticated-fall-detection")
+    train_and_test_model(sfd_model, train_loader_densenet, test_frames, "VGG-fall-detection")
     print("VGGModel successful ran")
 
 
-# # Train and test the Transformer model
-#     simple_model = SimpleFallDetectionModel()  
-#     train_set_simple = FallDetectionDataset(train_frames, transform='default')
-#     train_loader_simple = DataLoader(train_set_simple, batch_size=32, shuffle=True)
-#     train_and_test_model(simple_model, train_loader_simple, test_frames, "simple-fall-detection")
-#     print("SimpleFallDetectionModel successfully ran")
+    # Train and test the simple feedforward model
+    simple_model = SimpleFallDetectionModel()  
+    train_set_simple = FallDetectionDataset(train_frames, transform='default')
+    train_loader_simple = DataLoader(train_set_simple, batch_size=32, shuffle=True)
+    train_and_test_model(simple_model, train_loader_simple, test_frames, "feedforward-fall-detection")
+    print("SimpleFallDetectionModel successfully ran")
+
+    # Train and test the alex-net mode
+    alexnet_model = AlexNet()
+    train_set_alex = FallDetectionDataset(train_frames, transform='default')
+    train_loader_alex = DataLoader(train_set_alex, batch_size=32, shuffle=True)
+    train_and_test_model(alexnet_model, train_loader_alex, test_frames, "alexnet_model-fall-detection")
+    print("alexnet_model successfully ran")
+
 
 
 if __name__ == "__main__":
