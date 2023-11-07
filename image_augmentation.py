@@ -33,13 +33,13 @@ class DataAugmentation:
 
         if augmentation_choices:
             selected_augmentation = random.choice(augmentation_choices)
-            return selected_augmentation(frame)
+            augmented_frame = selected_augmentation(frame)
 
-        # If no augmentation functions are available, return the original frame
-        return frame
+            # Overwrite the original image with the augmented image
+            augmented_frame.save(frame_path)
 
     def apply_rotation(self, frame):
-        rotation_angle = random.randint(-90, 90)
+        rotation_angle = random.randint(-10, 10)
         return frame.rotate(rotation_angle)
 
     def apply_color_contrast_augmentation(self, frame):
@@ -53,7 +53,7 @@ class DataAugmentation:
 
     def apply_noise_injection(self, frame):
         frame_np = np.array(frame)
-        noise = np.random.normal(0, 5, frame_np.shape).astype(np.uint8)
+        noise = np.random.normal(0, 1, frame_np.shape).astype(np.uint8)
         frame_with_noise = np.clip(frame_np + noise, 0, 255).astype(np.uint8)
         return Image.fromarray(frame_with_noise)
 
@@ -61,9 +61,10 @@ class DataAugmentation:
         frame = ImageOps.mirror(frame)
         return frame
 
-    def apply_random_shearing(self, frame):
-        max_shear_x = 2  # Maximum shear angle in the x-direction (degrees)
-        max_shear_y = 2  # Maximum shear angle in the y-direction (degrees)
+
+    def apply_random_shearing(self,frame):
+        max_shear_x = 0.5  # Maximum shear angle in the x-direction (degrees)
+        max_shear_y = 0.5  # Maximum shear angle in the y-direction (degrees)
 
         shear_x = random.uniform(-max_shear_x, max_shear_x)
         shear_y = random.uniform(-max_shear_y, max_shear_y)
