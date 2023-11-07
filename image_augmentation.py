@@ -39,7 +39,7 @@ class DataAugmentation:
             augmented_frame.save(frame_path)
 
     def apply_rotation(self, frame):
-        rotation_angle = random.randint(-15, 15)
+        rotation_angle = random.randint(-10, 10)
         return frame.rotate(rotation_angle)
 
     def apply_color_contrast_augmentation(self, frame):
