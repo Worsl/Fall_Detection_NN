@@ -16,12 +16,15 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
     a linear layer as the classifier
     """
 
-    def __init__(self, base_model: str = 'resnet'):
+    def __init__(self, base_model: str = 'resnet', learning_rate: float = 1e-5):
         """
 
         :param base_model: str, the type of base model as the feature extractor
+        :param learning_rate: float, the learning rate of the optimizer
         """
         super().__init__()
+
+        self.lr = learning_rate
 
         if base_model == 'resnet':
             self.feature_extractor = torchvision.models.resnet50(pretrained=True)
@@ -68,7 +71,7 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
 
     def test_step(self, batch, batch_idx):

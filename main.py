@@ -6,6 +6,7 @@ The entry script to train the model for fall detection with PyTorch Lightning
 """
 
 import os
+import fire
 from tqdm.auto import tqdm
 from torch.utils.data import DataLoader
 import torch
@@ -92,12 +93,12 @@ def train_and_test_model(model, train_loader, valid_loader, test_loader, model_n
     trainer.test(model=model, dataloaders=test_loader)
 
 
-def main():
+def main(model_name: str = 'resnet'):
     # Load image file paths
     train_frames, valid_frames, test_frames = load_image_file_paths(FRAMES_DIRECTORY)
 
     # Train and test the ResNet model
-    resnet_model = BinaryClassificationDetectionModel(base_model='resnet')
+    resnet_model = BinaryClassificationDetectionModel(base_model=model_name)
     train_set = FallDetectionDataset(train_frames, transform='augmented')  # only apply data augmentation on train set
     train_loader = DataLoader(train_set, batch_size=32, shuffle=True)
     valid_set = FallDetectionDataset(valid_frames, transform='default')
@@ -108,22 +109,6 @@ def main():
     train_and_test_model(resnet_model, train_loader, valid_loader, test_loader, model_name="ResNet")
     print("ResNet successful ran")
 
-    # Train and test the VGG model
-
-    sfd_model = BinaryClassificationDetectionModel(base_model='vgg16')
-    train_set_densenet = FallDetectionDataset(train_frames, transform='default')
-    train_loader_densenet = DataLoader(train_set_densenet, batch_size=32, shuffle=True)
-    train_and_test_model(sfd_model, train_loader_densenet, test_frames, "sophisticated-fall-detection")
-    print("VGGModel successful ran")
-
-
-# # Train and test the Transformer model
-#     simple_model = SimpleFallDetectionModel()  
-#     train_set_simple = FallDetectionDataset(train_frames, transform='default')
-#     train_loader_simple = DataLoader(train_set_simple, batch_size=32, shuffle=True)
-#     train_and_test_model(simple_model, train_loader_simple, test_frames, "simple-fall-detection")
-#     print("SimpleFallDetectionModel successfully ran")
-
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(main)
