@@ -88,7 +88,8 @@ def train_and_test_model(model, train_loader, valid_loader, test_loader, model_n
     trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=valid_loader)
     # Load the best model after training, ref: https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.
     # ModelCheckpoint.html
-    model.load_from_checkpoint(model_checkpoint_hook.best_model_path)
+    print(f'Loading checkpoint from {model_checkpoint_hook.best_model_path}')
+    BinaryClassificationDetectionModel.load_from_checkpoint(model_checkpoint_hook.best_model_path, strict=False)
     # Test the model's performance
     trainer.test(model=model, dataloaders=test_loader)
 
@@ -106,8 +107,7 @@ def main(model_name: str = 'resnet'):
     test_set = FallDetectionDataset(test_frames, transform='default')
     test_loader = DataLoader(test_set, batch_size=32, shuffle=False)
 
-    train_and_test_model(resnet_model, train_loader, valid_loader, test_loader, model_name="ResNet")
-    print("ResNet successful ran")
+    train_and_test_model(resnet_model, train_loader, valid_loader, test_loader, model_name)
 
 
 if __name__ == "__main__":

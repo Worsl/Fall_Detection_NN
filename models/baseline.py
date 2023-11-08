@@ -44,6 +44,8 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         self.confusion_matrix_calculator = torchmetrics.ConfusionMatrix(task="binary", num_classes=2)
         self.auroc = torchmetrics.AUROC(task="binary")
 
+        self.save_hyperparameters()
+
     def training_step(self, batch, batch_idx):
         x, y = batch
         y = y.float()
