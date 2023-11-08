@@ -16,17 +16,22 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
     a linear layer as the classifier
     """
 
-    def __init__(self, base_model: str = 'resnet'):
+    def __init__(self, base_model: str = 'resnet', learning_rate: float = 1e-5):
         """
 
         :param base_model: str, the type of base model as the feature extractor
+        :param learning_rate: float, the learning rate of the optimizer
         """
         super().__init__()
+
+        self.lr = learning_rate
 
         if base_model == 'resnet':
             self.feature_extractor = torchvision.models.resnet50(pretrained=True)
         elif base_model == 'vgg16':
             self.feature_extractor = torchvision.models.vgg16(pretrained=True)
+        elif base_model == 'alexnet':
+            self.feature_extractor = torchvision.models.AlexNet(pretrained=True)
         else:
             raise ValueError(f'{base_model} is an unknown model')
 
@@ -41,6 +46,8 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         self.confusion_matrix_calculator = torchmetrics.ConfusionMatrix(task="binary", num_classes=2)
         self.auroc = torchmetrics.AUROC(task="binary")
 
+        self.save_hyperparameters()
+
     def training_step(self, batch, batch_idx):
         x, y = batch
         y = y.float()
@@ -50,10 +57,25 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         y_hat = y_hat.squeeze(1)
         loss = nn.functional.binary_cross_entropy(y_hat, y)
         self.log("train_loss", loss)
+        # Log the first 3 training images to W&B
+        if batch_idx == 0:
+            images = x[:3]
+            wandb.log({"examples_train": [wandb.Image(image) for image in images]})
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y = y.float()
+        z = self.feature_extractor(x)
+        z = self.fc(z)
+        y_hat = self.activation_func(z)
+        y_hat = y_hat.squeeze(1)
+        loss = nn.functional.binary_cross_entropy(y_hat, y)
+        self.log("valid_loss", loss)
         return loss
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
 
     def test_step(self, batch, batch_idx):

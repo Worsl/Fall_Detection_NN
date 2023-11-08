@@ -1,6 +1,14 @@
 # Fall_Detection_NN
 project for AY23 Neural Networks
 
+# How to Run the Script 
+The entry script is `main.py`, e.g., 
+```bash
+python main.py --model_name=vgg16  # the base model is vgg16
+python main.py --model_name=resnet  # the base model is resnet
+```
+
+
 # Dataset
 ## Potential DataSet links
 https://universe.roboflow.com/roboflow-universe-projects/fall-detection-ca3o8/dataset/4
