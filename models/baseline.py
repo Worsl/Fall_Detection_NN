@@ -30,6 +30,8 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
             self.feature_extractor = torchvision.models.resnet50(pretrained=True)
         elif base_model == 'vgg16':
             self.feature_extractor = torchvision.models.vgg16(pretrained=True)
+        elif base_model == 'alexnet':
+            self.feature_extractor = torchvision.models.AlexNet(pretrained=True)
         else:
             raise ValueError(f'{base_model} is an unknown model')
 
