@@ -16,7 +16,7 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
     a linear layer as the classifier
     """
 
-    def __init__(self, base_model: str = 'resnet', learning_rate: float = 1e-5):
+    def __init__(self, base_model: str = 'resnet', learning_rate: float = 1e-5, is_pretrained=True):
         """
 
         :param base_model: str, the type of base model as the feature extractor
@@ -25,13 +25,14 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         super().__init__()
 
         self.lr = learning_rate
+        self.is_pretrained = is_pretrained
 
         if base_model == 'resnet':
-            self.feature_extractor = torchvision.models.resnet50(pretrained=True)
+            self.feature_extractor = torchvision.models.resnet50(pretrained=is_pretrained)
         elif base_model == 'vgg16':
-            self.feature_extractor = torchvision.models.vgg16(pretrained=True)
+            self.feature_extractor = torchvision.models.vgg16(pretrained=is_pretrained)
         elif base_model == 'alexnet':
-            self.feature_extractor = torchvision.models.AlexNet(pretrained=True)
+            self.feature_extractor = torchvision.models.alexnet(pretrained=is_pretrained)
         else:
             raise ValueError(f'{base_model} is an unknown model')
 

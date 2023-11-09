@@ -72,6 +72,8 @@ def train_and_test_model(model, train_loader, valid_loader, test_loader, model_n
     # Initialize a logging tool (WandbLogger)
     logger = WandbLogger(save_dir='.', project='fall_detection', log_model=True)
     logger.experiment.config["model"] = model_name
+    logger.experiment.config["learning_rate"] = model.lr
+    logger.experiment.config["is_pretrained"] = model.is_pretrained
 
     callbacks = []
     model_checkpoint_hook = ModelCheckpoint(monitor='valid_loss', mode='min', save_top_k=1)
@@ -94,12 +96,13 @@ def train_and_test_model(model, train_loader, valid_loader, test_loader, model_n
     trainer.test(model=model, dataloaders=test_loader)
 
 
-def main(model_name: str = 'resnet'):
+def main(model_name: str = 'resnet', learning_rate: float = 1e-5, is_pretrained: bool = True):
     # Load image file paths
     train_frames, valid_frames, test_frames = load_image_file_paths(FRAMES_DIRECTORY)
 
     # Train and test the ResNet model
-    resnet_model = BinaryClassificationDetectionModel(base_model=model_name)
+    resnet_model = BinaryClassificationDetectionModel(base_model=model_name, learning_rate=learning_rate,
+                                                      is_pretrained=is_pretrained)
     train_set = FallDetectionDataset(train_frames, transform='augmented')  # only apply data augmentation on train set
     train_loader = DataLoader(train_set, batch_size=32, shuffle=True)
     valid_set = FallDetectionDataset(valid_frames, transform='default')
