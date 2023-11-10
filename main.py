@@ -22,11 +22,10 @@ from dataset import FallDetectionDataset
 from models.baseline import BinaryClassificationDetectionModel
 from image_augmentation import DataAugmentation
 
-IS_DEBUG_MODE = True  # Trainer will only run 1 step on training and testing if set to True
-FRAMES_DIRECTORY = 'data/Frames_Extracted'
+IS_DEBUG_MODE = False  # Trainer will only run 1 step on training and testing if set to True
 DEFAULT_ROOT_DIR = 'checkpoint'
 IS_ADD_EARLY_STOPPING = True
-MAX_EPOCHS = 10
+MAX_EPOCHS = 50
 
 
 def load_image_file_paths(frames_directory: str):
