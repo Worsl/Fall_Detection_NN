@@ -97,13 +97,16 @@ def train_and_test_model(model, train_loader, valid_loader, test_loader, model_n
 
 
 def main(model_name: str = 'resnet', learning_rate: float = 1e-5, is_pretrained: bool = True, batch_size: int = 32,
-         frames_directory: str = 'data/Frames_Extracted_Camera2'):
+         frames_directory: str = 'data/Frames_Extracted_Camera2', is_extra_fc_layers: bool = False,
+         is_freeze_base_model: bool = False):
     # Load image file paths
     train_frames, valid_frames, test_frames = load_image_file_paths(frames_directory)
 
     # Train and test the ResNet model
     resnet_model = BinaryClassificationDetectionModel(base_model=model_name, learning_rate=learning_rate,
-                                                      is_pretrained=is_pretrained)
+                                                      is_pretrained=is_pretrained,
+                                                      is_extra_fc_layers=is_extra_fc_layers,
+                                                      is_freeze_base_model=is_freeze_base_model)
     train_set = FallDetectionDataset(train_frames, transform='augmented')  # only apply data augmentation on train set
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True)
     valid_set = FallDetectionDataset(valid_frames, transform='default')
