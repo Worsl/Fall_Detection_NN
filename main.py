@@ -90,8 +90,9 @@ def train_and_test_model(model, train_loader, valid_loader, test_loader, model_n
     trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=valid_loader)
     # Load the best model after training, ref: https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.callbacks.
     # ModelCheckpoint.html
-    print(f'Loading checkpoint from {model_checkpoint_hook.best_model_path}')
-    BinaryClassificationDetectionModel.load_from_checkpoint(model_checkpoint_hook.best_model_path, strict=False)
+    if not IS_DEBUG_MODE:   # debug mode does not save any checkpoint, so the steps below are skipped.
+        print(f'Loading checkpoint from {model_checkpoint_hook.best_model_path}')
+        BinaryClassificationDetectionModel.load_from_checkpoint(model_checkpoint_hook.best_model_path, strict=False)
     # Test the model's performance
     trainer.test(model=model, dataloaders=test_loader)
 
