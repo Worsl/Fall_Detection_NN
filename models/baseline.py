@@ -5,6 +5,7 @@ This script includes a baseline classifier that uses pre-trained ResNet50
 import wandb
 import torchvision
 import torch
+import random
 import torchmetrics
 from torch import nn
 import pytorch_lightning as pl
@@ -16,7 +17,8 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
     a linear layer as the classifier
     """
 
-    def __init__(self, base_model: str = 'resnet', learning_rate: float = 1e-5):
+    def __init__(self, base_model: str = 'resnet', learning_rate: float = 1e-5, is_pretrained=True,
+                 is_extra_fc_layers: bool = False, is_freeze_base_model: bool = False):
         """
 
         :param base_model: str, the type of base model as the feature extractor
@@ -25,17 +27,29 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         super().__init__()
 
         self.lr = learning_rate
+        self.is_pretrained = is_pretrained
 
         if base_model == 'resnet':
-            self.feature_extractor = torchvision.models.resnet50(pretrained=True)
+            self.feature_extractor = torchvision.models.resnet50(pretrained=is_pretrained)
         elif base_model == 'vgg16':
-            self.feature_extractor = torchvision.models.vgg16(pretrained=True)
+            self.feature_extractor = torchvision.models.vgg16(pretrained=is_pretrained)
         elif base_model == 'alexnet':
-            self.feature_extractor = torchvision.models.AlexNet(pretrained=True)
+            self.feature_extractor = torchvision.models.alexnet(pretrained=is_pretrained)
         else:
             raise ValueError(f'{base_model} is an unknown model')
 
-        self.fc = nn.Linear(1000, 1)
+        if is_freeze_base_model:    # Freeze the model
+            for param in self.feature_extractor.parameters():
+                param.requires_grad = False
+
+        if is_extra_fc_layers:
+            self.fc = nn.Sequential(
+                    nn.Linear(1000, 250),
+                    nn.ReLU(),
+                    nn.Linear(250, 1),
+                    )
+        else:
+            self.fc = nn.Linear(1000, 1)
         self.activation_func = nn.Sigmoid()
 
         # loss function
@@ -78,6 +92,14 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
         return optimizer
 
+    def forward(self, batch):
+        x = batch
+        z = self.feature_extractor(x)
+        z = self.fc(z)
+        y_hat = self.activation_func(z)
+        y_hat = y_hat.squeeze(1)
+        return y_hat
+
     def test_step(self, batch, batch_idx):
         """
         Process each batch during test. The evaluation metrics include binary cross entropy loss and ROC-AUC
@@ -110,9 +132,10 @@ class BinaryClassificationDetectionModel(pl.LightningModule):
         auc_value = self.auroc(pred, target)
         wandb.log({"auc": auc_value})
         # get confusion matrix
+        pred_labels = (pred > 0.5).cpu().flatten().tolist()
         wandb.log({"conf_mat": wandb.plot.confusion_matrix(probs=None,
                                                            y_true=target.cpu().flatten().tolist(),
-                                                           preds=(pred > 0.5).cpu().flatten().tolist(),
+                                                           preds=pred_labels,
                                                            class_names=['is_fall', 'not_fall'])})
         # log examples of TP, FP, TN, FN
         tp_images = [img for p, t, img in zip(pred, target, images) if p == t == 1]
