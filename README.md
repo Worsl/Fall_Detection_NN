@@ -53,4 +53,3 @@ ANS: Perhaps we can do some kind of data augmentation?
     Blur and Sharpen: Applying blur or sharpen filters to simulate focus variations.
 
 
-# Discuss failure of models if any
